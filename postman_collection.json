@@ -1,0 +1,394 @@
+{
+  "info": {
+    "name": "Vehicle Rental System API",
+    "description": "Complete API collection for Vehicle Rental Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "staffToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "bookingId",
+      "value": ""
+    },
+    {
+      "key": "vehicleId",
+      "value": ""
+    },
+    {
+      "key": "branchId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"customer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Staff",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Staff User\",\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"staff\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data.token) {", "    pm.environment.set('customerToken', jsonData.data.token);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Staff",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data.token) {", "    pm.environment.set('staffToken', jsonData.data.token);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data.token) {", "    pm.environment.set('adminToken', jsonData.data.token);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/profile",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Branches",
+      "item": [
+        {
+          "name": "Create Branch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data._id) {", "    pm.environment.set('branchId', jsonData.data._id);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/branches",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Downtown Branch\",\n  \"city\": \"Bangalore\",\n  \"address\": \"123 Main Street\",\n  \"phone\": \"+91-9876543210\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Branches",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/branches"
+          }
+        },
+        {
+          "name": "Get Branch by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/branches/{{branchId}}"
+          }
+        },
+        {
+          "name": "Update Branch",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/branches/{{branchId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+91-9999999999\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "Create Vehicle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data._id) {", "    pm.environment.set('vehicleId', jsonData.data._id);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vehicles",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": \"{{branchId}}\",\n  \"type\": \"car\",\n  \"model\": \"Swift\",\n  \"brand\": \"Maruti Suzuki\",\n  \"year\": 2023,\n  \"licensePlate\": \"KA-01-AB-1234\",\n  \"perDayRate\": 1500,\n  \"fuelType\": \"petrol\",\n  \"transmission\": \"manual\",\n  \"seats\": 5\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles"
+          }
+        },
+        {
+          "name": "Get Vehicle by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}"
+          }
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"perDayRate\": 1800\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Available Vehicles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/search?branchId={{branchId}}&startDate=2026-09-15&endDate=2026-09-20&type=car",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "search"],
+              "query": [
+                { "key": "branchId", "value": "{{branchId}}" },
+                { "key": "startDate", "value": "2026-09-15" },
+                { "key": "endDate", "value": "2026-09-20" },
+                { "key": "type", "value": "car" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var jsonData = pm.response.json();", "if (jsonData.data && jsonData.data._id) {", "    pm.environment.set('bookingId', jsonData.data._id);", "}"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"branchId\": \"{{branchId}}\",\n  \"startDate\": \"2026-09-15\",\n  \"endDate\": \"2026-09-20\",\n  \"addOns\": [\n    { \"name\": \"insurance\", \"price\": 200 },\n    { \"name\": \"gps\", \"price\": 100 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Pickup Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/pickup",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"odometer\": 15000,\n  \"fuelLevel\": 100,\n  \"damageNotes\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Return Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/return",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"odometer\": 15300,\n  \"fuelLevel\": 70,\n  \"damageNotes\": \"Minor scratch on bumper\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/cancel",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Customer Rental History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/bookings/customer/USER_ID_HERE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Fleet Utilization Report",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/reports/utilization",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
+        },
+        {
+          "name": "Revenue by Date Range",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports/revenue?startDate=2026-09-01&endDate=2026-09-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reports", "revenue"],
+              "query": [
+                { "key": "startDate", "value": "2026-09-01" },
+                { "key": "endDate", "value": "2026-09-30" }
+              ]
+            },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
