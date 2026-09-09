@@ -192,6 +192,16 @@
               "raw": "{\n  \"phone\": \"+91-9999999999\"\n}"
             }
           }
+        },
+        {
+          "name": "Delete Branch",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/branches/{{branchId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
         }
       ]
     },
@@ -246,6 +256,16 @@
               "mode": "raw",
               "raw": "{\n  \"perDayRate\": 1800\n}"
             }
+          }
+        },
+        {
+          "name": "Delete Vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
           }
         }
       ]

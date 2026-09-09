@@ -5,6 +5,17 @@ book rentals for a date range, and staff manage the fleet, pickups, returns
 (with damage/fuel checks), branches, and reports. The public landing page is a
 cinematic black × orange experience; the app itself is a role-based dashboard.
 
+## Team Details
+
+| # | Name | Roll No | Department / Section | Owned Modules |
+|---|------|---------|----------------------|---------------|
+| 1 | Member 1 | — | — | Auth, Branches, Fleet, Availability Search |
+| 2 | Member 2 | — | — | Booking, Pickup/Return Inspections, Status Flow |
+| 3 | Member 3 | — | — | Pricing/Add-ons, Cancellation, History, Reports, RBAC |
+| 4 | Member 4 | — | — | Schema design, Postman testing, README, demo/landing UI |
+
+> Replace the placeholders above with actual names and roll numbers before submission.
+
 ## Tech Stack
 
 | Layer    | Technology |
@@ -113,6 +124,45 @@ Unknown routes return `{ success: false, message: "Route not found", errorCode: 
 - **inspections** — `bookingId, stage (pickup|return), odometer, fuelLevel,
   damageNotes, inspectedBy`
 
+### Entity Relationships
+
+```
+┌──────────┐      ┌──────────┐      ┌──────────┐
+│  users   │      │ branches │      │ vehicles │
+│customer/ │──┐   │name, city│──┐   │type,model│
+│staff/    │  │   └──────────┘  │   │rate,     │
+│admin     │  │                 │   │status    │
+└──────────┘  │   ┌──────────┐  │   └──────────┘
+  │           ├──▶│ bookings │◀─┘         ▲
+  │           │   │dates,    │◀───────────┘
+  │           │   │status,   │
+  │           │   │amount    │
+  │           │   └──────────┘
+  │           │         │
+  │           │         ▼
+  │           │   ┌──────────────┐
+  │           └──▶│ inspections  │
+  └──────────────▶│pickup/return │
+     inspectedBy  └──────────────┘
+```
+
+- One **branch** has many **vehicles** and many **bookings** (one-to-many).
+- One **user** (customer) has many **bookings**; one **booking** belongs to one
+  customer, one vehicle, one branch (many-to-one).
+- One **booking** has up to two **inspections** (pickup + return, one-to-many).
+- Staff link in via `inspectedBy` and optional `branchId` (many-to-one).
+
+### Reference vs Embed Decisions
+
+Rule followed: embed data always read with its parent and rarely updated alone;
+reference data shared across documents or updated independently.
+
+| Decision | Reasoning |
+|----------|-----------|
+| `addOns[]` **embedded** in Booking | Add-ons are only ever read as part of the booking price breakdown and are snapshotted at booking time (price changes later must not rewrite history) |
+| Everything else **referenced** (ObjectIds) | Users, branches, and vehicles are shared across many bookings and updated independently (e.g. vehicle status flips `available ↔ booked`); embedding would duplicate and stale them |
+| No `$lookup` chains in hot paths | Reads use Mongoose `populate` on single refs; the only aggregations (`$lookup` ×2 in reports) are confined to the admin reporting controller |
+
 ### Booking Status Flow
 
 ```
@@ -199,6 +249,16 @@ search persists its last query in `drive_search` and reuses it for booking links
   images, no animation libraries.
 
 ---
+
+## Known Limitations
+
+- Single currency (INR) and single time zone; no multi-locale support.
+- Payments, SMS/email, and maps are out of scope (no payment gateway
+  integration — booking confirmation is the purchase record).
+- Damage charge is a flat ₹500 + fuel-difference top-up, not a workshop estimate.
+- No automated tests; verification is via the Postman collection and the demo flow.
+- In-memory (`MONGODB_URI=memory`) data does not persist across restarts — use a
+  real MongoDB URI for persistent deployments.
 
 ## Troubleshooting
 
