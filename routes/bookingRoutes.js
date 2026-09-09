@@ -26,6 +26,12 @@ router.post(
   createBooking
 );
 
+router.get(
+  "/customer/:id",
+  authenticate,
+  getCustomerBookings
+);
+
 router.get("/:id", authenticate, getBookingById);
 
 router.post(
@@ -57,11 +63,5 @@ router.post(
 );
 
 router.post("/:id/cancel", authenticate, cancelBooking);
-
-router.get(
-  "/customer/:id",
-  authenticate,
-  getCustomerBookings
-);
 
 module.exports = router;

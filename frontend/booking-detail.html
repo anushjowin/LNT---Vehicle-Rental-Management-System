@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Detail — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appLayout" class="app-layout"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!requireAuth()) throw new Error("Not authenticated");
+        buildLayout("my-bookings");
+        document.getElementById("pageTitle").textContent = "Booking Detail";
+
+        const content = document.getElementById("pageContent");
+        const user = getUser();
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get("id");
+
+        if (!bookingId) { window.location.href = "my-bookings.html"; }
+
+        async function loadBooking() {
+            try {
+                const res = await apiFetch(`/bookings/${bookingId}`);
+                const b = res.data;
+
+                const canCancel = (b.status === "reserved" || b.status === "picked_up");
+                const canPickup = (b.status === "reserved" && (user.role === "staff" || user.role === "admin"));
+                const canReturn = (b.status === "picked_up" && (user.role === "staff" || user.role === "admin"));
+
+                content.innerHTML = `
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="form-card">
+                                <div class="d-flex justify-between align-center mb-4">
+                                    <div>
+                                        <h5 class="heading-lg">Booking #${b._id.slice(-8).toUpperCase()}</h5>
+                                        <span class="badge-status badge-${b.status}" style="font-size:0.85rem;margin-top:8px;display:inline-block">${b.status.replace("_", " ").toUpperCase()}</span>
+                                    </div>
+                                    <a href="my-bookings.html" class="btn btn-outline btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><polyline points="15 18 9 12 15 6"/></svg> Back</a>
+                                </div>
+
+                                <div class="grid-2" style="gap:20px">
+                                    <div>
+                                        <span class="text-muted text-sm">Vehicle</span><br>
+                                        <strong>${b.vehicleId?.brand || ''} ${b.vehicleId?.model || ''}</strong><br>
+                                        <span class="text-muted">${b.vehicleId?.licensePlate || ''} &middot; ${b.vehicleId?.type || ''}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-muted text-sm">Branch</span><br>
+                                        <strong>${b.branchId?.name || 'N/A'}</strong><br>
+                                        <span class="text-muted">${b.branchId?.city || ''}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-muted text-sm">Customer</span><br>
+                                        <strong>${b.customerId?.name || user.name}</strong><br>
+                                        <span class="text-muted">${b.customerId?.email || user.email}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-muted text-sm">Rental Period</span><br>
+                                        <strong>${formatDate(b.startDate)} to ${formatDate(b.endDate)}</strong><br>
+                                        <span class="text-muted">${b.totalDays} day(s)</span>
+                                    </div>
+                                </div>
+
+                                ${(b.addOns && b.addOns.length > 0) ? `
+                                    <div class="mt-4">
+                                        <span class="text-muted text-sm">Add-Ons</span><br>
+                                        <div class="mt-2">
+                                            ${b.addOns.map(a => `<span class="badge-status" style="background:var(--c-surface-raised);color:var(--c-text);border:1px solid var(--c-border);margin-right:8px;margin-bottom:8px;padding:6px 12px;border-radius:8px;font-size:0.8rem">${a.name} - ${formatCurrency(a.price)}</span>`).join("")}
+                                        </div>
+                                    </div>
+                                ` : ""}
+
+                                ${b.damageCharge > 0 ? `
+                                    <div class="mt-4" style="background:rgba(255,68,68,0.12);color:#ff4444;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:8px">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        Damage Charge: <strong>${formatCurrency(b.damageCharge)}</strong>
+                                    </div>
+                                ` : ""}
+
+                                ${b.cancellationCharge > 0 ? `
+                                    <div class="mt-4" style="background:rgba(255,170,0,0.12);color:#ffaa00;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:8px">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                        Cancellation Charge: <strong>${formatCurrency(b.cancellationCharge)}</strong>
+                                    </div>
+                                ` : ""}
+
+                                <div id="alertBox" class="mt-3"></div>
+
+                                <div class="d-flex gap-2 mt-4">
+                                    ${canPickup ? `<button class="btn btn-warning" onclick="processPickup()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Process Pickup</button>` : ""}
+                                    ${canReturn ? `<button class="btn btn-success" onclick="processReturn()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Process Return</button>` : ""}
+                                    ${canCancel ? `<button class="btn btn-danger" onclick="cancelBooking()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancel Booking</button>` : ""}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="booking-summary">
+                                <h5 class="heading-lg mb-3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Cost Breakdown</h5>
+                                <div class="summary-row"><span>Base rate (${b.totalDays} days)</span><span>${formatCurrency(b.baseRate * b.totalDays)}</span></div>
+                                ${(b.addOns && b.addOns.length > 0) ? `<div class="summary-row"><span>Add-ons</span><span>${formatCurrency(b.addOnsTotal)}</span></div>` : ""}
+                                ${b.damageCharge > 0 ? `<div class="summary-row" style="color:var(--c-danger)"><span>Damage charge</span><span>${formatCurrency(b.damageCharge)}</span></div>` : ""}
+                                ${b.cancellationCharge > 0 ? `<div class="summary-row" style="color:var(--c-warning)"><span>Cancellation charge</span><span>${formatCurrency(b.cancellationCharge)}</span></div>` : ""}
+                                <div class="summary-row total"><span>Total Amount</span><span>${formatCurrency(b.totalAmount)}</span></div>
+                            </div>
+                        </div>
+                    </div>`;
+            } catch (err) {
+                content.innerHTML = `<div class="alert" style="background:rgba(255,68,68,0.12);color:#ff4444;padding:16px;border-radius:12px">Failed to load booking details</div>`;
+            }
+        }
+
+        function processPickup() {
+            window.location.href = `pickup.html?bookingId=${bookingId}`;
+        }
+
+        function processReturn() {
+            window.location.href = `return.html?bookingId=${bookingId}`;
+        }
+
+        async function cancelBooking() {
+            if (!confirm("Are you sure you want to cancel this booking?")) return;
+            const alertBox = document.getElementById("alertBox");
+
+            try {
+                const res = await apiFetch(`/bookings/${bookingId}/cancel`, { method: "POST" });
+                showAlert(alertBox, "Booking cancelled successfully!", "success");
+                setTimeout(() => loadBooking(), 1500);
+            } catch (err) {
+                showAlert(alertBox, err.message || "Cancellation failed");
+            }
+        }
+
+        loadBooking();
+    </script>
+</body>
+</html>

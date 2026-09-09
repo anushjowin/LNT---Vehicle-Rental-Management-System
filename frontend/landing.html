@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRIVE — Drive Without Limits | Premium Vehicle Rentals</title>
+<meta name="description" content="Premium cars and bikes on rent. Search, compare and book your next ride in minutes. Transparent pricing, verified vehicles, 24/7 support.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="css/landing.css" rel="stylesheet">
+</head>
+<body id="top">
+
+<!-- cinematic loader -->
+<div class="loader" id="loader" aria-hidden="true">
+  <span class="loader-brand">DRIVE<span>.</span></span>
+  <span class="loader-line"><span></span></span>
+</div>
+
+<!-- page transition sweep -->
+<div class="transition" id="transition" aria-hidden="true"><span></span></div>
+
+<!-- custom cursor -->
+<div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel">VIEW RIDE →</span></div>
+
+<!-- film grain -->
+<div class="grain" aria-hidden="true"></div>
+
+<!-- always-on ambient motion background -->
+<canvas class="ambient" id="ambient" aria-hidden="true"></canvas>
+
+<!-- scroll progress -->
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- scroll progress -->
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="DRIVE home">
+      <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.2 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></span>
+      DRIVE<span class="brand-dot">.</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#categories" data-sec="categories">Explore</a>
+      <a href="vehicles.html">Vehicles</a>
+      <a href="#locations" data-sec="locations">Locations</a>
+      <a href="#how" data-sec="how">How It Works</a>
+      <span class="nav-ind" id="navInd" aria-hidden="true"></span>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-login" href="index.html" id="navLogin">Login</a>
+      <a class="nav-login" href="register.html">Register</a>
+      <a class="btn btn-fire btn-sm magnetic" href="#book" id="navCta">Book Now</a>
+      <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+    <a href="#categories">Explore</a>
+    <a href="vehicles.html">Vehicles</a>
+    <a href="#locations">Locations</a>
+    <a href="#how">How It Works</a>
+    <a href="index.html" id="mLogin">Login</a>
+    <a href="register.html">Register</a>
+    <a class="btn btn-fire" href="#book" id="mCta">Book Now</a>
+  </nav>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero" aria-label="Drive without limits">
+  <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <p class="hero-label"><span class="hero-tick" aria-hidden="true"></span>Premium vehicle rentals</p>
+    <h1 class="hero-title">
+      <span class="line"><span>Drive without</span></span>
+      <span class="line"><span>limits.</span></span>
+    </h1>
+    <p class="hero-sub">Premium cars and bikes.<br>Available when you are.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-fire btn-lg magnetic" href="vehicles.html">Explore vehicles
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      <a class="btn btn-ghost btn-lg magnetic" href="#how">How it works</a>
+    </div>
+  </div>
+
+  <!-- floating booking widget -->
+  <div class="book-wrap" id="book">
+    <form class="book-card" id="searchForm" novalidate aria-label="Search vehicles">
+      <div class="book-grid">
+        <div class="field" data-field="location">
+          <label id="locLabel">Pickup location</label>
+          <button type="button" class="field-input" id="locBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="locLabel locValue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="locValue" class="placeholder">Where from?</span>
+            <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="loc-pop" id="locPop" role="listbox" aria-label="Pickup locations" hidden></ul>
+        </div>
+        <div class="field">
+          <label for="pickupAt">Pickup</label>
+          <div class="field-input">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="datetime-local" id="pickupAt" aria-label="Pickup date and time">
+          </div>
+        </div>
+        <div class="field">
+          <label for="returnAt">Return</label>
+          <div class="field-input">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <input type="datetime-local" id="returnAt" aria-label="Return date and time">
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label" id="typeLabel">Vehicle</span>
+          <div class="seg" role="group" aria-labelledby="typeLabel">
+            <button type="button" class="seg-btn active" data-vtype="" aria-pressed="true">All</button>
+            <button type="button" class="seg-btn" data-vtype="car" aria-pressed="false">Cars</button>
+            <button type="button" class="seg-btn" data-vtype="bike" aria-pressed="false">Bikes</button>
+          </div>
+        </div>
+        <div class="field field-cta">
+          <span class="field-label" aria-hidden="true">&nbsp;</span>
+          <button type="submit" class="btn btn-fire btn-search" id="searchBtn">
+            <span class="btn-label">Search rides
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            <span class="btn-spin" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <p class="form-err" id="searchErr" role="alert" hidden></p>
+      <p class="search-live" id="searchLive" aria-live="polite">Pick a city and dates — we will line up the fleet.</p>
+    </form>
+  </div>
+
+  <a class="scroll-cue" href="#categories" aria-label="Scroll to explore">
+    <span>Scroll to explore</span>
+    <span class="cue-line" aria-hidden="true"><span></span></span>
+  </a>
+</section>
+
+<!-- ================= CATEGORIES ================= -->
+<section class="section" id="categories" aria-labelledby="catH">
+  <div class="wrap">
+    <p class="kicker" data-reveal>Explore</p>
+    <h2 id="catH" data-reveal>Choose your drive.</h2>
+    <p class="sec-sub" data-reveal>Built for every kind of journey.</p>
+    <div class="cat-grid">
+      <a class="cat-card" data-reveal data-glow href="vehicles.html?type=car">
+        <span class="cat-media" aria-hidden="true"><img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=60" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <span class="cat-sweep" aria-hidden="true"></span>
+        <span class="cat-body"><span class="cat-name">SUVs</span><span class="cat-desc">Power meets comfort.</span></span>
+        <span class="cat-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="cat-card" data-reveal data-glow href="vehicles.html?type=car">
+        <span class="cat-media" aria-hidden="true"><img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=60" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <span class="cat-sweep" aria-hidden="true"></span>
+        <span class="cat-body"><span class="cat-name">Sedans</span><span class="cat-desc">Smooth. Refined. Effortless.</span></span>
+        <span class="cat-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="cat-card" data-reveal data-glow href="vehicles.html?type=car">
+        <span class="cat-media" aria-hidden="true"><img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=60" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <span class="cat-sweep" aria-hidden="true"></span>
+        <span class="cat-body"><span class="cat-name">Hatchbacks</span><span class="cat-desc">Compact city freedom.</span></span>
+        <span class="cat-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="cat-card" data-reveal data-glow href="vehicles.html?type=bike">
+        <span class="cat-media" aria-hidden="true"><img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=60" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <span class="cat-sweep" aria-hidden="true"></span>
+        <span class="cat-body"><span class="cat-name">Bikes</span><span class="cat-desc">Fast. Agile. Unrestricted.</span></span>
+        <span class="cat-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+      <a class="cat-card cat-wide" data-reveal data-glow href="vehicles.html">
+        <span class="cat-media" aria-hidden="true"><img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=60" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <span class="cat-sweep" aria-hidden="true"></span>
+        <span class="cat-body"><span class="cat-name">Premium</span><span class="cat-desc">For when ordinary isn't enough.</span></span>
+        <span class="cat-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURED VEHICLES ================= -->
+<section class="section" id="vehicles" aria-labelledby="featH">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker" data-reveal>Fleet</p>
+        <h2 id="featH" data-reveal>Rides worth taking.</h2>
+        <p class="sec-sub" data-reveal>Explore our most popular vehicles.</p>
+      </div>
+      <a class="link-more" data-reveal href="vehicles.html">View all vehicles
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    </div>
+    <div class="veh-grid" id="vehGrid" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ================= HORIZONTAL SHOWCASE ================= -->
+<section class="showcase" id="showcase" aria-label="Vehicle showcase">
+  <div class="hwrap" id="hwrap">
+    <div class="hstick">
+      <div class="wrap hhead">
+        <p class="kicker">Showcase</p>
+        <h2>Built to be stared at.</h2>
+      </div>
+      <div class="htrack" id="htrack">
+        <a class="hcard" href="vehicles.html?type=car"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=60" alt="Sports coupe" loading="lazy" onerror="this.style.display='none'"><span><strong>Coupe</strong><em>Weekend weapon →</em></span></a>
+        <a class="hcard" href="vehicles.html?type=car"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1000&q=60" alt="Premium sedan at night" loading="lazy" onerror="this.style.display='none'"><span><strong>Night runner</strong><em>City after dark →</em></span></a>
+        <a class="hcard" href="vehicles.html?type=car"><img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1000&q=60" alt="Luxury car front" loading="lazy" onerror="this.style.display='none'"><span><strong>Executive</strong><em>Arrive louder →</em></span></a>
+        <a class="hcard" href="vehicles.html?type=car"><img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=60" alt="SUV on mountain road" loading="lazy" onerror="this.style.display='none'"><span><strong>Trail boss</strong><em>Leave the map →</em></span></a>
+        <a class="hcard" href="vehicles.html?type=bike"><img src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=60" alt="Motorcycle close-up" loading="lazy" onerror="this.style.display='none'"><span><strong>Street bike</strong><em>Cut through →</em></span></a>
+        <a class="hcard hend" href="vehicles.html"><span><strong>Your pick awaits.</strong><em>Browse the fleet →</em></span></a>
+      </div>
+      <div class="hprog" aria-hidden="true"><span id="hprogBar"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="stats" aria-label="Platform statistics">
+  <div class="wrap stats-grid">
+    <div class="stat" data-reveal><strong><span class="count" data-to="50000" data-suffix="K+">0</span></strong><span>Happy drivers</span></div>
+    <div class="stat" data-reveal><strong><span class="count" data-to="10000" data-suffix="K+" id="statVeh">0</span></strong><span>Vehicles</span></div>
+    <div class="stat" data-reveal><strong><span class="count" data-to="25" data-suffix="+" id="statLoc">0</span></strong><span>Locations</span></div>
+    <div class="stat" data-reveal><strong><span class="count" data-to="4.8" data-dec="1" data-suffix="">0</span></strong><span>Average rating</span></div>
+  </div>
+</section>
+
+<!-- ================= WHY ================= -->
+<section class="section" id="why" aria-labelledby="whyH">
+  <div class="wrap">
+    <p class="kicker" data-reveal>Why Drive</p>
+    <h2 id="whyH" data-reveal>Built different.</h2>
+    <p class="sec-sub" data-reveal>Everything you need for a better rental experience.</p>
+    <div class="feat-grid">
+      <div class="feat-card" data-reveal data-glow><span class="feat-ico" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span><h3>Verified vehicles</h3><p>Every vehicle is maintained and inspected before rental.</p><span class="feat-line" aria-hidden="true"></span></div>
+      <div class="feat-card" data-reveal data-glow><span class="feat-ico" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span><h3>Zero surprises</h3><p>Know exactly what you're paying before you book.</p><span class="feat-line" aria-hidden="true"></span></div>
+      <div class="feat-card" data-reveal data-glow><span class="feat-ico" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><h3>Flexible bookings</h3><p>Plans that fit your schedule, down to the hour.</p><span class="feat-line" aria-hidden="true"></span></div>
+      <div class="feat-card" data-reveal data-glow><span class="feat-ico" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span><h3>24/7 support</h3><p>We're always available, wherever the road takes you.</p><span class="feat-line" aria-hidden="true"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="section how" id="how" aria-labelledby="howH">
+  <div class="wrap how-inner">
+    <p class="kicker" data-reveal>Process</p>
+    <h2 id="howH" data-reveal>Three steps. Zero friction.</h2>
+    <p class="sec-sub" data-reveal>From search to ignition in minutes.</p>
+    <div class="timeline" id="timeline">
+      <span class="tl-rail" aria-hidden="true"></span>
+      <span class="tl-fill" id="tlFill" aria-hidden="true"></span>
+      <ol class="steps">
+        <li class="step" data-reveal><span class="step-no" aria-hidden="true">01</span><h3>Search</h3><p>Choose your location and dates.</p></li>
+        <li class="step" data-reveal><span class="step-no" aria-hidden="true">02</span><h3>Book</h3><p>Select your perfect vehicle.</p></li>
+        <li class="step" data-reveal><span class="step-no" aria-hidden="true">03</span><h3>Drive</h3><p>Pick it up and hit the road.</p></li>
+      </ol>
+    </div>
+    <div class="steps-cta" data-reveal><a class="btn btn-fire btn-lg magnetic" href="vehicles.html">Start searching
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+  </div>
+</section>
+
+<!-- ================= CINEMATIC BANNER ================= -->
+<section class="banner" aria-labelledby="bannerH">
+  <div class="banner-bg" id="bannerBg" aria-hidden="true"></div>
+  <div class="banner-shade" aria-hidden="true"></div>
+  <div class="wrap banner-inner">
+    <h2 id="bannerH" data-reveal>The road is yours.</h2>
+    <p data-reveal>Where will you go next?</p>
+    <a class="btn btn-fire btn-lg magnetic" data-reveal href="vehicles.html">Start your journey
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </div>
+</section>
+
+<!-- ================= LOCATIONS ================= -->
+<section class="section" id="locations" aria-labelledby="locH">
+  <div class="wrap">
+    <p class="kicker" data-reveal>Locations</p>
+    <h2 id="locH" data-reveal>Find your ride.</h2>
+    <p class="sec-sub" data-reveal>Live branches across the country — pick your city.</p>
+    <div class="loc-grid" id="locGrid" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ================= REVIEWS ================= -->
+<section class="section" id="reviews" aria-labelledby="revH">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker" data-reveal>Reviews</p>
+        <h2 id="revH" data-reveal>Driven by people.</h2>
+        <p class="sec-sub" data-reveal>Real trips, real reviews.</p>
+      </div>
+      <div class="car-nav" role="group" aria-label="Testimonial navigation" data-reveal>
+        <button class="car-btn" id="revPrev" aria-label="Previous reviews"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <button class="car-btn" id="revNext" aria-label="Next reviews"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+    </div>
+    <div class="rev-track" id="revTrack">
+      <figure class="rev-card on"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><blockquote>"Booking was incredibly smooth. The car was clean, well maintained and ready exactly on time."</blockquote><figcaption><span class="avatar" aria-hidden="true">PS</span><span><strong>Priya Sharma</strong><span class="rev-meta">Hyundai Creta · Bangalore</span></span></figcaption></figure>
+      <figure class="rev-card"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><blockquote>"Transparent pricing for once — the bill matched the app to the rupee. Already booked my second trip."</blockquote><figcaption><span class="avatar" aria-hidden="true">RM</span><span><strong>Rahul Menon</strong><span class="rev-meta">Maruti Swift · Mumbai</span></span></figcaption></figure>
+      <figure class="rev-card"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><blockquote>"Booked a Thar at 11pm, keys in hand by 9am. Pickup took five minutes flat. Superb experience."</blockquote><figcaption><span class="avatar" aria-hidden="true">AK</span><span><strong>Ananya Krishnan</strong><span class="rev-meta">Mahindra Thar · Goa</span></span></figcaption></figure>
+      <figure class="rev-card"><div class="stars" aria-label="5 out of 5 stars">★★★★★</div><blockquote>"The Duke was in perfect shape for a weekend run to Nandi Hills. Support even helped with route planning."</blockquote><figcaption><span class="avatar" aria-hidden="true">VI</span><span><strong>Vikram Iyer</strong><span class="rev-meta">KTM Duke 390 · Bangalore</span></span></figcaption></figure>
+    </div>
+    <div class="rev-dots" id="revDots" role="tablist" aria-label="Choose review"></div>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="final" aria-labelledby="finalH">
+  <div class="wrap final-inner">
+    <p class="kicker" data-reveal>One booking away</p>
+    <h2 id="finalH" data-reveal>Ready to drive?</h2>
+    <p data-reveal>Your next journey is one booking away.</p>
+    <div data-reveal><a class="btn btn-fire btn-xl magnetic" href="vehicles.html">Find your ride
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="section" id="faq" aria-labelledby="faqH">
+  <div class="wrap faq-wrap">
+    <p class="kicker" data-reveal>Questions</p>
+    <h2 id="faqH" data-reveal>Before you drive.</h2>
+    <p class="sec-sub" data-reveal>Everything you need to know before you drive.</p>
+    <div class="faq-list" id="faqList">
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">How does vehicle rental work?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>Choose your pickup location and dates in the search above, pick a vehicle, and confirm. You'll get an instant booking confirmation with pickup instructions.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">What documents are required?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>A valid driving licence is mandatory for every booking and is verified before your first trip. You must be at least 21 (24 for premium class).</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">Can I cancel my booking?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>Yes — cancellation is free up to 48 hours before pickup. Later cancellations carry a charge that is always shown before you confirm.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">How is pricing calculated?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>The daily rate × number of days, plus any add-ons you choose (insurance, driver, GPS). Taxes are included in the price you see — no surprises at the counter.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">Can I extend my rental?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>Yes, subject to availability. Contact support or your branch before your scheduled return and we'll extend the booking at the same daily rate.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">What happens during pickup?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>Plan on ten minutes at the counter. We do a walkaround inspection together, note fuel level and any existing marks, then hand over the keys.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">What happens if the vehicle is damaged?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>Report it immediately through support. Damage is assessed against the pre-rental inspection record, and the optional insurance add-on caps your liability.</p></div></div>
+      <div class="faq-item" data-reveal><button class="faq-q" aria-expanded="false">What payment methods are supported?<svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a"><p>UPI, credit and debit cards, net banking and popular wallets. Payment is collected securely online at booking time.</p></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div class="f-brand">
+      <a class="brand" href="#top" aria-label="DRIVE home"><span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.2 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></span>DRIVE<span class="brand-dot">.</span></a>
+      <p class="f-tag">Drive your way.</p>
+      <p>Premium cars and bikes on rent across India. Book in minutes, drive with confidence.</p>
+      <div class="social" aria-label="Social links">
+        <a href="#top" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></a>
+        <a href="#top" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="#top" aria-label="X"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1.6 2H8l4.4 5.9L18.9 2zm-1.1 18h1.7L7 3.9H5.2L17.8 20z"/></svg></a>
+      </div>
+    </div>
+    <nav aria-label="Explore"><h3>Explore</h3><a href="vehicles.html">Vehicles</a><a href="#locations">Locations</a><a href="#how">How It Works</a><a href="#categories">Categories</a></nav>
+    <nav aria-label="Company"><h3>Company</h3><a href="#why">About</a><a href="#reviews">Reviews</a><a href="#faq">FAQs</a><a href="register.html">Careers</a></nav>
+    <nav aria-label="Support"><h3>Support</h3><a href="#faq">Help Center</a><a href="#faq">Cancellation Policy</a><a href="#faq">Terms</a><a href="#faq">Privacy</a></nav>
+  </div>
+  <div class="wrap footer-base"><span>© 2026 DRIVE. All rights reserved.</span><span>Made for drivers, by drivers.</span></div>
+</footer>
+
+<button class="to-top" id="toTop" aria-label="Back to top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="18 15 12 9 6 15"/></svg></button>
+
+<script src="js/api.js"></script>
+<script src="js/landing.js"></script>
+</body>
+</html>

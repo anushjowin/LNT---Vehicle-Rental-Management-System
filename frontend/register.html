@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-left">
+            <div class="auth-left-content">
+                <h1>Drive the<br><span>future.</span></h1>
+                <p>Create your account and unlock access to our premium fleet of vehicles.</p>
+            </div>
+        </div>
+        <div class="auth-right">
+            <div class="auth-card">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--c-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.2 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                    DRIVE<span>.</span>
+                </div>
+                <h2>Create account</h2>
+                <p class="subtitle">Join DRIVE. and hit the road.</p>
+
+                <div id="alertBox"></div>
+
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required placeholder="you@example.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="password" required minlength="6" placeholder="Min 6 characters" autocomplete="new-password" oninput="checkStrength()">
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <div class="password-strength" id="strengthBar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <span class="text-muted" id="strengthText" style="font-size:0.75rem;"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Register as</label>
+                        <select class="form-control" id="role">
+                            <option value="customer">Customer</option>
+                            <option value="staff">Branch Staff</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="regBtn">Create Account</button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="index.html">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        if (isAuthenticated()) { window.location.href = "dashboard.html"; }
+
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function checkStrength() {
+            const pw = document.getElementById("password").value;
+            const fill = document.getElementById("strengthFill");
+            const text = document.getElementById("strengthText");
+            let score = 0;
+            if (pw.length >= 6) score++;
+            if (pw.length >= 10) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+            const levels = [
+                { w: "0%", c: "transparent", t: "" },
+                { w: "20%", c: "#ff4444", t: "Weak" },
+                { w: "40%", c: "#ff6b00", t: "Fair" },
+                { w: "60%", c: "#ffaa00", t: "Good" },
+                { w: "80%", c: "#00c48c", t: "Strong" },
+                { w: "100%", c: "#00c48c", t: "Very strong" }
+            ];
+            const l = levels[score] || levels[0];
+            fill.style.width = l.w;
+            fill.style.background = l.c;
+            text.textContent = pw.length > 0 ? l.t : "";
+        }
+
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("regBtn");
+            const alertBox = document.getElementById("alertBox");
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Creating...';
+
+            try {
+                const data = await apiFetch("/auth/register", {
+                    method: "POST",
+                    body: {
+                        name: document.getElementById("name").value,
+                        email: document.getElementById("email").value,
+                        password: document.getElementById("password").value,
+                        role: document.getElementById("role").value
+                    }
+                });
+                setToken(data.data.token);
+                setUser(data.data);
+                window.location.href = "dashboard.html";
+            } catch (err) {
+                showAlert(alertBox, err.message || "Registration failed");
+                btn.disabled = false;
+                btn.textContent = "Create Account";
+            }
+        });
+    </script>
+</body>
+</html>

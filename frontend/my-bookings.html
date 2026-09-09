@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appLayout" class="app-layout"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!requireAuth()) throw new Error("Not authenticated");
+        buildLayout("my-bookings");
+        document.getElementById("pageTitle").textContent = "My Bookings";
+
+        const content = document.getElementById("pageContent");
+        const user = getUser();
+
+        async function loadBookings() {
+            try {
+                const res = await apiFetch(`/bookings/customer/${user._id}`);
+                const bookings = res.data || [];
+
+                if (bookings.length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--c-text-dim)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <h5>No Bookings Yet</h5>
+                            <p>You haven't made any bookings. Start by searching for a vehicle.</p>
+                            <a href="vehicles.html" class="btn btn-primary mt-2">Search Vehicles</a>
+                        </div>`;
+                    return;
+                }
+
+                content.innerHTML = `
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>All Bookings (${bookings.length})</h5>
+                        </div>
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${bookings.map(b => `
+                                    <tr>
+                                        <td><code>${b._id.slice(-8).toUpperCase()}</code></td>
+                                        <td>${b.vehicleId?.brand || ''} ${b.vehicleId?.model || ''} <br><small class="text-muted">${b.vehicleId?.licensePlate || ''}</small></td>
+                                        <td>${formatDate(b.startDate)}<br><small class="text-muted">to ${formatDate(b.endDate)}</small></td>
+                                        <td><span class="badge-status badge-${b.status}">${b.status.replace("_", " ")}</span></td>
+                                        <td><strong>${formatCurrency(b.totalAmount)}</strong></td>
+                                        <td><a href="booking-detail.html?id=${b._id}" class="btn btn-outline btn-sm">View</a></td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>`;
+            } catch (err) {
+                content.innerHTML = `<div class="alert" style="background:rgba(255,68,68,0.12);color:#ff4444;padding:16px;border-radius:12px">Failed to load bookings</div>`;
+            }
+        }
+
+        loadBookings();
+    </script>
+</body>
+</html>

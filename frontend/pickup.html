@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Pickup — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appLayout" class="app-layout"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!requireAuth()) throw new Error("Not authenticated");
+        if (!requireRole("staff", "admin")) throw new Error("Not authorized");
+        buildLayout("pickup");
+        document.getElementById("pageTitle").textContent = "Process Pickup";
+
+        const content = document.getElementById("pageContent");
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get("bookingId");
+
+        function render() {
+            content.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="form-card">
+                            <h5 class="heading-lg mb-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Pickup Inspection</h5>
+                            <p class="text-muted mb-4">Record vehicle condition at handover</p>
+
+                            <div id="alertBox"></div>
+
+                            <form id="pickupForm">
+                                <div class="form-group">
+                                    <label class="form-label">Booking ID</label>
+                                    <input type="text" class="form-control" id="bookingInput" value="${bookingId || ''}" ${bookingId ? 'readonly style="opacity:0.6;cursor:not-allowed"' : ''} required placeholder="Enter booking ID">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Odometer Reading (km)</label>
+                                    <input type="number" class="form-control" id="odometer" required min="0" placeholder="e.g., 15000">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Fuel Level (%)</label>
+                                    <input type="number" class="form-control" id="fuelLevel" required min="0" max="100" placeholder="0-100">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Damage Notes (optional)</label>
+                                    <textarea class="form-control" id="damageNotes" rows="3" placeholder="Any existing damage..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning w-100" id="submitBtn" style="margin-top:8px">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Record Pickup
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.getElementById("pickupForm").addEventListener("submit", submitPickup);
+        }
+
+        async function submitPickup(e) {
+            e.preventDefault();
+            const btn = document.getElementById("submitBtn");
+            const alertBox = document.getElementById("alertBox");
+            const bid = document.getElementById("bookingInput").value.trim();
+
+            if (!bid) { showAlert(alertBox, "Please enter a booking ID"); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Processing...';
+
+            try {
+                await apiFetch(`/bookings/${bid}/pickup`, {
+                    method: "POST",
+                    body: {
+                        odometer: parseFloat(document.getElementById("odometer").value),
+                        fuelLevel: parseFloat(document.getElementById("fuelLevel").value),
+                        damageNotes: document.getElementById("damageNotes").value
+                    }
+                });
+                showAlert(alertBox, "Pickup recorded successfully!", "success");
+                setTimeout(() => { window.location.href = `booking-detail.html?id=${bid}`; }, 1500);
+            } catch (err) {
+                showAlert(alertBox, err.message || "Pickup failed");
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Record Pickup';
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Fleet — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appLayout" class="app-layout"></div>
+
+    <div class="modal-overlay" id="vehicleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Add Vehicle</h5>
+                <button class="modal-close" onclick="hideModal()">&times;</button>
+            </div>
+            <form id="vehicleForm">
+                <input type="hidden" id="v_id">
+                <div class="form-group">
+                    <label class="form-label">Branch</label>
+                    <select class="form-control" id="v_branchId" required>
+                        <option value="">Select branch</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select class="form-control" id="v_type" required>
+                            <option value="car">Car</option>
+                            <option value="bike">Bike</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        <input type="text" class="form-control" id="v_brand" required>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Model</label>
+                        <input type="text" class="form-control" id="v_model" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Year</label>
+                        <input type="number" class="form-control" id="v_year" required>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">License Plate</label>
+                        <input type="text" class="form-control" id="v_licensePlate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Per Day Rate (&#8377;)</label>
+                        <input type="number" class="form-control" id="v_perDayRate" required min="0">
+                    </div>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Fuel Type</label>
+                        <select class="form-control" id="v_fuelType">
+                            <option value="petrol">Petrol</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="electric">Electric</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Transmission</label>
+                        <select class="form-control" id="v_transmission">
+                            <option value="manual">Manual</option>
+                            <option value="automatic">Automatic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Seats</label>
+                        <input type="number" class="form-control" id="v_seats" value="5" min="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="hideModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveVehicle()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!requireAuth()) throw new Error("Not authenticated");
+        if (!requireRole("staff", "admin")) throw new Error("Not authorized");
+        buildLayout("manage-vehicles");
+        document.getElementById("pageTitle").textContent = "Manage Vehicles";
+
+        const content = document.getElementById("pageContent");
+        const user = getUser();
+        let vehicles = [];
+        let branches = [];
+
+        function showModal() { document.getElementById("vehicleModal").classList.add("show"); }
+        function hideModal() { document.getElementById("vehicleModal").classList.remove("show"); }
+
+        async function loadData() {
+            try {
+                const [vRes, bRes] = await Promise.all([
+                    apiFetch("/vehicles"),
+                    apiFetch("/branches")
+                ]);
+                vehicles = vRes.data || [];
+                branches = bRes.data || [];
+                renderTable();
+            } catch (err) {
+                content.innerHTML = `<div class="alert" style="background:rgba(255,68,68,0.12);color:#ff4444;padding:16px;border-radius:12px">Failed to load data</div>`;
+            }
+        }
+
+        function renderTable() {
+            const sel = document.getElementById("v_branchId");
+            if (sel) {
+                sel.innerHTML = branches.map(b => `<option value="${b._id}">${b.name}</option>`).join("");
+            }
+
+            content.innerHTML = `
+                <div class="data-table">
+                    <div class="table-header">
+                        <h5>Fleet (${vehicles.length} vehicles)</h5>
+                        <button class="btn btn-primary btn-sm" onclick="openModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Vehicle
+                        </button>
+                    </div>
+                    <div id="alertBox" style="padding:16px 20px 0"></div>
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Branch</th>
+                                <th>Plate</th>
+                                <th>Rate/Day</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${vehicles.map(v => `
+                                <tr>
+                                    <td><strong>${v.brand} ${v.model}</strong><br><small class="text-muted">${v.year} &middot; ${v.type}</small></td>
+                                    <td>${v.branchId?.name || 'N/A'}</td>
+                                    <td><code>${v.licensePlate}</code></td>
+                                    <td>${formatCurrency(v.perDayRate)}</td>
+                                    <td><span class="badge-status badge-${v.status}">${v.status}</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" style="margin-right:6px" onclick="editVehicle('${v._id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>
+                                        ${user.role === "admin" ? `<button class="btn btn-danger btn-sm" onclick="deleteVehicle('${v._id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>` : ""}
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        function openModal(vehicle = null) {
+            if (vehicle) {
+                document.getElementById("modalTitle").textContent = "Edit Vehicle";
+                document.getElementById("v_id").value = vehicle._id;
+                document.getElementById("v_branchId").value = vehicle.branchId?._id || vehicle.branchId;
+                document.getElementById("v_type").value = vehicle.type;
+                document.getElementById("v_brand").value = vehicle.brand;
+                document.getElementById("v_model").value = vehicle.model;
+                document.getElementById("v_year").value = vehicle.year;
+                document.getElementById("v_licensePlate").value = vehicle.licensePlate;
+                document.getElementById("v_perDayRate").value = vehicle.perDayRate;
+                document.getElementById("v_fuelType").value = vehicle.fuelType || "petrol";
+                document.getElementById("v_transmission").value = vehicle.transmission || "manual";
+                document.getElementById("v_seats").value = vehicle.seats || 5;
+            } else {
+                document.getElementById("modalTitle").textContent = "Add Vehicle";
+                document.getElementById("vehicleForm").reset();
+                document.getElementById("v_id").value = "";
+            }
+            showModal();
+        }
+
+        function editVehicle(id) {
+            const v = vehicles.find(v => v._id === id);
+            if (v) openModal(v);
+        }
+
+        async function saveVehicle() {
+            const alertBox = document.getElementById("alertBox");
+            const id = document.getElementById("v_id").value;
+            const body = {
+                branchId: document.getElementById("v_branchId").value,
+                type: document.getElementById("v_type").value,
+                brand: document.getElementById("v_brand").value,
+                model: document.getElementById("v_model").value,
+                year: parseInt(document.getElementById("v_year").value),
+                licensePlate: document.getElementById("v_licensePlate").value,
+                perDayRate: parseFloat(document.getElementById("v_perDayRate").value),
+                fuelType: document.getElementById("v_fuelType").value,
+                transmission: document.getElementById("v_transmission").value,
+                seats: parseInt(document.getElementById("v_seats").value)
+            };
+
+            try {
+                if (id) {
+                    await apiFetch(`/vehicles/${id}`, { method: "PUT", body });
+                } else {
+                    await apiFetch("/vehicles", { method: "POST", body });
+                }
+                hideModal();
+                showAlert(alertBox, id ? "Vehicle updated!" : "Vehicle created!", "success");
+                loadData();
+            } catch (err) {
+                showAlert(alertBox, err.message || "Save failed");
+            }
+        }
+
+        async function deleteVehicle(id) {
+            if (!confirm("Delete this vehicle?")) return;
+            const alertBox = document.getElementById("alertBox");
+            try {
+                await apiFetch(`/vehicles/${id}`, { method: "DELETE" });
+                showAlert(alertBox, "Vehicle deleted!", "success");
+                loadData();
+            } catch (err) {
+                showAlert(alertBox, err.message || "Delete failed");
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

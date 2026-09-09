@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Vehicle — DRIVE.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="appLayout" class="app-layout"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!requireAuth()) throw new Error("Not authenticated");
+        buildLayout("vehicles");
+        document.getElementById("pageTitle").textContent = "Book Vehicle";
+
+        const content = document.getElementById("pageContent");
+        const params = new URLSearchParams(window.location.search);
+        const vehicleId = params.get("vehicleId");
+        const startDate = params.get("start");
+        const endDate = params.get("end");
+
+        if (!vehicleId) { window.location.href = "vehicles.html"; }
+
+        const addOnsList = [
+            { name: "insurance", label: "Insurance", price: 200, icon: "shield" },
+            { name: "driver", label: "Professional Driver", price: 500, icon: "user" },
+            { name: "gps", label: "GPS Navigation", price: 100, icon: "map-pin" }
+        ];
+
+        const addOnIcons = {
+            insurance: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+            driver: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            gps: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+        };
+
+        async function init() {
+            try {
+                const res = await apiFetch(`/vehicles/${vehicleId}`);
+                const v = res.data;
+
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+                const total = v.perDayRate * totalDays;
+
+                content.innerHTML = `
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="form-card">
+                                <h5 class="heading-lg mb-3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.2 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg> Vehicle Details</h5>
+                                <div class="vehicle-img mb-3" style="height:200px;border-radius:12px">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--c-text-dim)" stroke-width="1.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.3 1 12.2 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                                </div>
+                                <div class="grid-2 mb-3">
+                                    <div><span class="text-muted text-sm">Brand</span><br><strong>${v.brand}</strong></div>
+                                    <div><span class="text-muted text-sm">Model</span><br><strong>${v.model}</strong></div>
+                                    <div><span class="text-muted text-sm">Year</span><br><strong>${v.year}</strong></div>
+                                    <div><span class="text-muted text-sm">Type</span><br><strong>${v.type}</strong></div>
+                                    <div><span class="text-muted text-sm">Plate</span><br><strong><code>${v.licensePlate}</code></strong></div>
+                                    <div><span class="text-muted text-sm">Fuel</span><br><strong>${v.fuelType || 'Petrol'}</strong></div>
+                                    <div><span class="text-muted text-sm">Transmission</span><br><strong>${v.transmission || 'Manual'}</strong></div>
+                                    <div><span class="text-muted text-sm">Seats</span><br><strong>${v.seats || 5}</strong></div>
+                                </div>
+                                <div class="mb-3">
+                                    <span class="text-muted text-sm">Branch</span><br>
+                                    <strong>${v.branchId?.name || 'N/A'}, ${v.branchId?.city || ''}</strong>
+                                </div>
+
+                                <h5 class="heading-lg mt-4 mb-3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Rental Period</h5>
+                                <div class="grid-2 mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="startDate" value="${startDate}" min="${new Date().toISOString().split('T')[0]}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="endDate" value="${endDate}">
+                                    </div>
+                                </div>
+
+                                <h5 class="heading-lg mt-4 mb-3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Add-Ons (Optional)</h5>
+                                <div class="add-ons-grid">
+                                    ${addOnsList.map(a => `
+                                        <div class="add-on-card">
+                                            <label class="add-on-label" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+                                                <input class="add-on-check" type="checkbox" value="${a.name}" data-price="${a.price}" id="addon_${a.name}" style="width:18px;height:18px;accent-color:var(--c-accent)">
+                                                <span style="color:var(--c-accent)">${addOnIcons[a.name]}</span>
+                                                <div>
+                                                    <strong>${a.label}</strong>
+                                                    <div class="text-muted text-sm">${formatCurrency(a.price)}/day</div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    `).join("")}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="booking-summary" style="position:sticky;top:80px">
+                                <h5 class="heading-lg mb-3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Booking Summary</h5>
+                                <div class="summary-row"><span>Vehicle</span><span>${v.brand} ${v.model}</span></div>
+                                <div class="summary-row"><span>Rate per day</span><span>${formatCurrency(v.perDayRate)}</span></div>
+                                <div class="summary-row"><span>Duration</span><span><span id="dayCount">${totalDays}</span> days</span></div>
+                                <div class="summary-row"><span>Base amount</span><span id="baseAmount">${formatCurrency(total)}</span></div>
+                                <div id="addOnsSummary"></div>
+                                <div class="summary-row total"><span>Total</span><span id="totalAmount">${formatCurrency(total)}</span></div>
+
+                                <div id="alertBox" class="mt-3"></div>
+
+                                <button class="btn btn-primary w-100 mt-3" id="bookBtn" onclick="confirmBooking()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Confirm Booking
+                                </button>
+                                <button class="btn btn-outline w-100 mt-2" onclick="history.back()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                document.getElementById("startDate").addEventListener("change", updateSummary);
+                document.getElementById("endDate").addEventListener("change", updateSummary);
+                document.querySelectorAll(".add-on-check").forEach(cb => cb.addEventListener("change", updateSummary));
+
+                window._vehicleRate = v.perDayRate;
+            } catch (err) {
+                content.innerHTML = `<div class="alert" style="background:rgba(255,68,68,0.12);color:#ff4444;padding:16px;border-radius:12px">Failed to load vehicle details</div>`;
+            }
+        }
+
+        function updateSummary() {
+            const start = new Date(document.getElementById("startDate").value);
+            const end = new Date(document.getElementById("endDate").value);
+            const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+            const base = window._vehicleRate * days;
+
+            let addonsTotal = 0;
+            document.querySelectorAll(".add-on-check:checked").forEach(cb => {
+                addonsTotal += parseInt(cb.dataset.price) * days;
+            });
+
+            document.getElementById("dayCount").textContent = days;
+            document.getElementById("baseAmount").textContent = formatCurrency(base);
+            document.getElementById("totalAmount").textContent = formatCurrency(base + addonsTotal);
+
+            const addonsDiv = document.getElementById("addOnsSummary");
+            addonsDiv.innerHTML = "";
+            document.querySelectorAll(".add-on-check:checked").forEach(cb => {
+                const price = parseInt(cb.dataset.price) * days;
+                addonsDiv.innerHTML += `<div class="summary-row"><span>${cb.value}</span><span>${formatCurrency(price)}</span></div>`;
+            });
+        }
+
+        async function confirmBooking() {
+            const btn = document.getElementById("bookBtn");
+            const alertBox = document.getElementById("alertBox");
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Booking...';
+
+            const addOns = [];
+            document.querySelectorAll(".add-on-check:checked").forEach(cb => {
+                addOns.push({ name: cb.value, price: parseInt(cb.dataset.price) });
+            });
+
+            try {
+                const res = await apiFetch("/bookings", {
+                    method: "POST",
+                    body: {
+                        vehicleId: vehicleId,
+                        startDate: document.getElementById("startDate").value,
+                        endDate: document.getElementById("endDate").value,
+                        addOns: addOns
+                    }
+                });
+                showAlert(alertBox, "Booking confirmed! Redirecting...", "success");
+                setTimeout(() => {
+                    window.location.href = `booking-detail.html?id=${res.data._id}`;
+                }, 1500);
+            } catch (err) {
+                showAlert(alertBox, err.message || "Booking failed");
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirm Booking';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
