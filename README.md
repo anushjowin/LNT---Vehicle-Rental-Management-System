@@ -7,14 +7,12 @@ cinematic black × orange experience; the app itself is a role-based dashboard.
 
 ## Team Details
 
-| # | Name | Roll No | Department / Section | Owned Modules |
-|---|------|---------|----------------------|---------------|
-| 1 | Member 1 | — | — | Auth, Branches, Fleet, Availability Search |
-| 2 | Member 2 | — | — | Booking, Pickup/Return Inspections, Status Flow |
-| 3 | Member 3 | — | — | Pricing/Add-ons, Cancellation, History, Reports, RBAC |
-| 4 | Member 4 | — | — | Schema design, Postman testing, README, demo/landing UI |
-
-> Replace the placeholders above with actual names and roll numbers before submission.
+| # | Name | Roll No | Owned Modules |
+|---|------|---------|---------------|
+| M1 | Annmarie Vinish | 2462041 | Auth, Branches, Fleet, Availability Search |
+| M2 | Anush Jowin A | 2462044 | Booking, Pickup/Return Inspections, Status Flow |
+| M3 | Avrel Leandra Pinto | 2462053 | Pricing/Add-ons, Cancellation, History, Reports, RBAC |
+| M4 | Aryan Sharma | 2462047 | Schema sign-off, Postman, README, landing UI |
 
 ## Tech Stack
 
