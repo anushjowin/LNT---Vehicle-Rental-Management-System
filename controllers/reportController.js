@@ -2,6 +2,7 @@ const Booking = require("../models/Booking");
 
 exports.getUtilizationReport = async (req, res, next) => {
   try {
+    // Generate fleet utilization report aggregating bookings by vehicle and branch
     const report = await Booking.aggregate([
       {
         $lookup: {

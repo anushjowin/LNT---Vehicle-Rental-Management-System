@@ -240,6 +240,10 @@ exports.cancelBooking = async (req, res, next) => {
     const pickupDate = new Date(booking.startDate);
     const hoursUntilPickup = (pickupDate - now) / (1000 * 60 * 60);
 
+    // Calculate cancellation charge based on the cancellation policy
+    // - More than 48 hours: 0%
+    // - 24-48 hours: 25%
+    // - Less than 24 hours or after pickup: 50%
     let cancellationCharge = 0;
     if (booking.status === "reserved") {
       if (hoursUntilPickup < 24) {
